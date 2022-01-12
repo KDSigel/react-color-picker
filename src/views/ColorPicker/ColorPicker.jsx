@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import Display from '../../components/Display/Display';
+import useAffirmation from '../../hooks/useAffirmation';
+import useColorPicker from '../../hooks/useColorPicker';
 import styles from './ColorPicker.css';
 
 export default function ColorPicker() {
-  const [fgColor, setFgColor] = useState('#ffcc00');
-  const [bgColor, setBgColor] = useState('#212121');
-  const [content, setContent] = useState('Hello, world!');
-  const [didChangeColor, setDidChangeColor] = useState(false);
-  const [affirmation, setAffirmation] = useState('');
+
+  const {
+    handleColorChange,
+    setDidChangeColor,
+    didChangeColor,
+    fgColor,
+    bgColor,
+  } = useColorPicker();
+  const { setAffirmation, setContent, affirmation, content } = useAffirmation();
 
   useEffect(() => {
     const affirmations = [
@@ -22,25 +28,6 @@ export default function ColorPicker() {
     setAffirmation(affirmations[randomIndex]);
   }, [bgColor, fgColor]);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    switch (name) {
-      case 'fgColor':
-        setFgColor(value);
-        setDidChangeColor(true);
-        break;
-      case 'bgColor':
-        setBgColor(value);
-        setDidChangeColor(true);
-        break;
-      case 'content':
-        setDidChangeColor(false);
-        setContent(value);
-        break;
-      default:
-        break;
-    }
-  };
 
   return (
     <>
@@ -55,21 +42,24 @@ export default function ColorPicker() {
           name="fgColor"
           aria-label="foreground color"
           value={fgColor}
-          onChange={handleChange}
+          onChange={handleColorChange}
         />
         <input
           type="color"
           name="bgColor"
           aria-label="background color"
           value={bgColor}
-          onChange={handleChange}
+          onChange={handleColorChange}
         />
         <input
           type="text"
           name="content"
           aria-label="content"
           value={content}
-          onChange={handleChange}
+          onChange={(e) => {
+            setContent(e.target.value);
+            setDidChangeColor(false);
+          }}
         />
       </fieldset>
       <Display content={content} bgColor={bgColor} fgColor={fgColor} />
